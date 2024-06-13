@@ -133,7 +133,7 @@ namespace ArcGISRuntimeWKT
                     break;
                 case "SharpMap.Geometries.LineString":
                     var ls = (Polyline) geometry;
-                    WriteLineString(ls.Parts[0].GetPoints(), bWriter, byteorder);
+                    WriteLineString(ls.Parts[0].Points, bWriter, byteorder);
                     break;
                 case "SharpMap.Geometries.Polygon":
                     WriteMultiPolygon((Polygon) geometry, bWriter, byteorder);
