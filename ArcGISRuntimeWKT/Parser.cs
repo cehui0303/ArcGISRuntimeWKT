@@ -21,11 +21,11 @@ namespace ArcGISRuntimeWKT
         ///     there is a parsing
         ///     problem.
         /// </returns>
-        public static Geometry GeometryFromWkt(string wellKnownText)
+        public static Geometry GeometryFromWkt(string wellKnownText, SpatialReference? sp)
         {
             // throws a parsing exception is there is a problem.
             var reader = new StringReader(wellKnownText);
-            return GeometryFromWkt(reader);
+            return GeometryFromWkt(reader,sp);
         }
 
         /// <summary>
@@ -39,10 +39,10 @@ namespace ArcGISRuntimeWKT
         ///     Returns a <see cref="Geometry" /> read from StreamReader.
         ///     An exception will be thrown if there is a parsing problem.
         /// </returns>
-        public static Geometry GeometryFromWkt(TextReader reader)
+        public static Geometry GeometryFromWkt(TextReader reader,SpatialReference? sp)
         {
             var tokenizer = new WktStreamTokenizer(reader);
-            return ArcGISRuntimeWKT.GeometryFromWkt.ReadGeometryTaggedText(tokenizer);
+            return ArcGISRuntimeWKT.GeometryFromWkt.ReadGeometryTaggedText(tokenizer,sp);
         }
 
 

@@ -211,7 +211,7 @@ namespace ArcGISRuntimeWKT
             foreach (var pc in poly.Parts)
             {
                 //Write the (lineString)LinearRing.
-                WriteLineString(pc.GetPoints(), bWriter, byteorder);
+                WriteLineString(pc.Points, bWriter, byteorder);
             }
         }
 
@@ -227,13 +227,14 @@ namespace ArcGISRuntimeWKT
             WriteUInt32((uint) mls.Parts.Count, bWriter, byteorder);
 
             //Loop on the number of linestrings.
-            foreach (var ls in mls.Parts.GetPartsAsPoints())
+            foreach (var ls in mls.Parts)
             {
+                
                 //Write LineString Header
                 bWriter.Write((byte) byteorder);
                 WriteUInt32((uint) WkbGeometryType.WkbLineString, bWriter, byteorder);
                 //Write each linestring.
-                WriteLineString(ls, bWriter, byteorder);
+                WriteLineString(ls.Points, bWriter, byteorder);
             }
         }
 

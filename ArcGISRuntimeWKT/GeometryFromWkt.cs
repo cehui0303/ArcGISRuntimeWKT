@@ -219,7 +219,7 @@ namespace ArcGISRuntimeWKT
         ///     shell and holes do not form closed linestrings, or if an unexpected
         ///     token is encountered.
         /// </remarks>
-        internal static Geometry ReadGeometryTaggedText(WktStreamTokenizer tokenizer)
+        internal static Geometry ReadGeometryTaggedText(WktStreamTokenizer tokenizer,SpatialReference? sp)
         {
             tokenizer.NextToken();
             var type = tokenizer.GetStringValue().ToUpper();
@@ -227,19 +227,19 @@ namespace ArcGISRuntimeWKT
             switch (type)
             {
                 case "POINT":
-                    geometry = ReadPointText(tokenizer);
+                    geometry = ReadPointText(tokenizer,sp);
                     break;
                 case "LINESTRING":
-                    geometry = ReadLineStringText(tokenizer);
+                    geometry = ReadLineStringText(tokenizer,sp);
                     break;
                 case "MULTILINESTRING":
-                    geometry = ReadMultiLineStringText(tokenizer);
+                    geometry = ReadMultiLineStringText(tokenizer,sp);
                     break;
                 case "POLYGON":
-                    geometry = ReadPolygonText(tokenizer);
+                    geometry = ReadPolygonText(tokenizer,sp);
                     break;
                 case "MULTIPOLYGON":
-                    geometry = ReadMultiPolygonText(tokenizer);
+                    geometry = ReadMultiPolygonText(tokenizer,sp);
                     break;
                 default:
                     throw new NotImplementedException($"Geometrytype '{type}' is not supported.");
@@ -259,7 +259,7 @@ namespace ArcGISRuntimeWKT
         ///     stream, or if if the coordinates used to create the <see cref="Polygon" />
         ///     shells and holes do not form closed linestrings.
         /// </returns>
-        private static Polygon ReadMultiPolygonText(WktStreamTokenizer tokenizer)
+        private static Polygon ReadMultiPolygonText(WktStreamTokenizer tokenizer, SpatialReference? sp)
         {
             var nextToken = GetNextEmptyOrOpener(tokenizer);
             if (nextToken == "EMPTY")
@@ -267,7 +267,7 @@ namespace ArcGISRuntimeWKT
                 throw new Exception("Empty MultiPolygon");
             }
 
-            var polygon = ReadPolygonText(tokenizer);
+            var polygon = ReadPolygonText(tokenizer,sp);
 
             var polygons = new PolygonBuilder(polygon);
 
@@ -283,7 +283,7 @@ namespace ArcGISRuntimeWKT
             nextToken = GetNextCloserOrComma(tokenizer);
             while (nextToken == ",")
             {
-                polygon = ReadPolygonText(tokenizer, exteriorRingCcw, true);
+                polygon = ReadPolygonText(tokenizer, sp,exteriorRingCcw, true);
                 polygons.AddParts(polygon.Parts);
                 nextToken = GetNextCloserOrComma(tokenizer);
             }
@@ -308,7 +308,7 @@ namespace ArcGISRuntimeWKT
         ///     shell and holes do not form closed linestrings, or if an unexpected
         ///     token is encountered.
         /// </remarks>
-        private static Polygon ReadPolygonText(WktStreamTokenizer tokenizer, bool exteriorRingCcw = false,
+        private static Polygon ReadPolygonText(WktStreamTokenizer tokenizer, SpatialReference? sp, bool exteriorRingCcw = false,
             bool exteriorRingCcwSpecified = false)
         {
             var nextToken = GetNextEmptyOrOpener(tokenizer);
@@ -332,7 +332,7 @@ namespace ArcGISRuntimeWKT
                 firstRing = exteriorRing;
             }
 
-            var polygonBuilder = new PolygonBuilder(firstRing);
+            var polygonBuilder = new PolygonBuilder(firstRing,sp);
 
             nextToken = GetNextCloserOrComma(tokenizer);
             while (nextToken == ",")
@@ -377,7 +377,7 @@ namespace ArcGISRuntimeWKT
         /// <remarks>
         ///     ParseException is thrown if an unexpected token is encountered.
         /// </remarks>
-        private static MapPoint ReadPointText(WktStreamTokenizer tokenizer)
+        private static MapPoint ReadPointText(WktStreamTokenizer tokenizer, SpatialReference? sp)
         {
             var nextToken = GetNextEmptyOrOpener(tokenizer);
             if (nextToken == "EMPTY")
@@ -398,7 +398,7 @@ namespace ArcGISRuntimeWKT
         ///     MultiLineString Text
         /// </param>
         /// <returns>a <see cref="Polyline" /> specified by the next token in the stream</returns>
-        private static Polyline ReadMultiLineStringText(WktStreamTokenizer tokenizer)
+        private static Polyline ReadMultiLineStringText(WktStreamTokenizer tokenizer, SpatialReference? sp)
         {
             var nextToken = GetNextEmptyOrOpener(tokenizer);
             if (nextToken == "EMPTY")
@@ -406,7 +406,7 @@ namespace ArcGISRuntimeWKT
                 throw new Exception("Empty Multiline");
             }
 
-            var lines = new PolylineBuilder(GetCoordinates(tokenizer));
+            var lines = new PolylineBuilder(GetCoordinates(tokenizer),sp);
 
             nextToken = GetNextCloserOrComma(tokenizer);
             while (nextToken == ",")
@@ -428,9 +428,9 @@ namespace ArcGISRuntimeWKT
         /// <remarks>
         ///     ParseException is thrown if an unexpected token is encountered.
         /// </remarks>
-        private static Polyline ReadLineStringText(WktStreamTokenizer tokenizer)
+        private static Polyline ReadLineStringText(WktStreamTokenizer tokenizer, SpatialReference? sp)
         {
-            return new Polyline(GetCoordinates(tokenizer));
+            return new Polyline(GetCoordinates(tokenizer),sp);
         }
     }
 }

@@ -69,7 +69,8 @@ namespace ArcGISRuntimeWKT
                 var point = (MapPoint) geometry;
                 AppendPointTaggedText(point, writer);
             }
-            else if (geometry is Polyline && ((Polyline) geometry).Parts.GetPartsAsPoints().Count(Algorithms.IsCcw) == 1)
+            //else if (geometry is Polyline && ((Polyline) geometry).Parts.GetPartsAsPoints().Count(Algorithms.IsCcw) == 1)
+            else if (geometry is Polyline && ((Polyline)geometry).Parts.Count == 1)
             {
                 AppendLineStringTaggedText((Polyline) geometry, writer);
             }
@@ -148,7 +149,7 @@ namespace ArcGISRuntimeWKT
         private static void AppendLineStringTaggedText(Polyline lineString, StringWriter writer)
         {
             writer.Write("LINESTRING ");
-            AppendLineStringText(lineString.Parts[0].GetPoints().ToList(), writer);
+            AppendLineStringText(lineString.Parts[0].Points, writer);
         }
 
         /// <summary>
@@ -271,11 +272,11 @@ namespace ArcGISRuntimeWKT
             else
             {
                 writer.Write("(");
-                AppendLineStringText(polygon.Parts[0].GetPoints().ToList(), writer); //ExteriorRing
+                AppendLineStringText(polygon.Parts[0].Points, writer); //ExteriorRing
                 for (var i = 1; i < polygon.Parts.Count; i++)
                 {
                     writer.Write(", ");
-                    AppendLineStringText(polygon.Parts[i].GetPoints().ToList(), writer); //InteriorRings
+                    AppendLineStringText(polygon.Parts[i].Points, writer); //InteriorRings
                 }
                 writer.Write(")");
             }
@@ -302,7 +303,7 @@ namespace ArcGISRuntimeWKT
                     {
                         writer.Write(", ");
                     }
-                    AppendLineStringText(multiLineString.Parts[i].GetPoints().ToList(), writer);
+                    AppendLineStringText(multiLineString.Parts[i].Points, writer);
                 }
                 writer.Write(")");
             }
